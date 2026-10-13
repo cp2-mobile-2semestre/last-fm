@@ -7,46 +7,82 @@ import Button from "../components/Button";
 import Header from "@/components/Header";
 import { router } from "expo-router";
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import {auth} from "@/services/firebase"
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "@/services/firebase";
 
 export default function LoginScreen() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  
-  const login = async() => {
-    try{
-      const credential = await signInWithEmailAndPassword(auth, email, password)  
-      //criar hook para persistir o token 
+  const login = async () => {
+    try {
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+
+      //criar hook para persistir o token
       const token = credential.user.getIdToken();
-      alert(`Usuario logado: ${email}`)
-    }catch(error: any){
-      alert('Usuario não encontrado.')
+
+      router.replace("/home" as any);
+    } catch (error: any) {
+      alert("Usuario não encontrado.");
     }
-  }
+  };
+
+  const sigUp = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      alert("Não foi possivel realziar o login");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Header/>
+      <Header />
       <View style={styles.form}>
         <Title titleText="Crie sua conta"></Title>
 
         <Title titleText="Nome de usuario"></Title>
-        <TextInput placeholder="Nome" value={username }onChangeText={(username) => setUsername(username)} />
+        <TextInput
+          placeholder="Nome"
+          value={username}
+          onChangeText={(username) => setUsername(username)}
+        />
 
         <Title titleText="Email"></Title>
-        <TextInput placeholder="Email" value={email} onChangeText={(email) => setEmail(email)} />
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={(email) => setEmail(email)}
+        />
 
         <Title titleText="Senha"></Title>
-        <TextInput placeholder="Senha" value={password} secureTextEntry onChangeText={(password) => setPassword(password)}/>
+        <TextInput
+          placeholder="Senha"
+          value={password}
+          secureTextEntry
+          onChangeText={(password) => setPassword(password)}
+        />
 
         <Title titleText="Confirme a sua senha"></Title>
 
-        <Button
-          title="Criar conta"
-          onPress={() => router.replace("/home" as any)}
-        />
+        <View style={styles.buttonCointainer}>
+          <Button
+            title="Login"
+            onPress={() => {login()}}
+          />
+          <Button
+            title="Criar conta"
+            onPress={() => {sigUp()}}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -60,9 +96,13 @@ const styles = StyleSheet.create({
   form: {
     padding: 20,
   },
+  buttonCointainer: {
+    flexDirection: "column",
+    gap: 15,
+  },
 });
 
-{/* <Button
+/*{ <Button
           title="Criar conta"
           onPress={()=> {login()}}
-        /> */}
+        /> }*/
