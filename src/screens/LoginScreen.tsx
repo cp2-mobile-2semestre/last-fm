@@ -5,6 +5,7 @@ import Title from "../components/Title";
 import TextInput from "../components/Input";
 import Button from "../components/Button";
 import Header from "@/components/Header";
+import { router } from "expo-router";
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import {auth} from "@/services/firebase"
@@ -44,7 +45,7 @@ export default function LoginScreen() {
 
         <Button
           title="Criar conta"
-          onPress={()=> {login()}}
+          onPress={() => router.replace("/home" as any)}
         />
       </View>
     </SafeAreaView>
@@ -60,3 +61,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 });
+
+{/* <Button
+          title="Criar conta"
+          onPress={()=> {login()}}
+        /> */}
