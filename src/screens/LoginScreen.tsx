@@ -29,7 +29,7 @@ export default function LoginScreen() {
       //criar hook para persistir o token
       const token = credential.user.getIdToken();
 
-      router.replace("/home" as any);
+      router.replace("/profileScreen" as any);
     } catch (error: any) {
       alert("Usuario não encontrado.");
     }
