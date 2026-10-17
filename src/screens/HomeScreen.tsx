@@ -14,6 +14,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/services/firebase";
 import { monitorPresence } from "@/services/presence";
 
+
 import { router } from "expo-router";
 
 import MiniCard from "@/components/MiniCard";
@@ -57,7 +58,7 @@ const tags = [
   },
 ];
 
-const navLinks = ["Music", "Events", "Charts", "Perfil"];
+const navLinks = ["Music", "Events", "Charts", "Profile"];
 const tabs = ["Overview", "New Releases"];
 
 export default function HomeScreen() {
@@ -112,7 +113,7 @@ export default function HomeScreen() {
               <Pressable
                 key={item}
                 onPress={() => {
-                  if (item === "Perfil") {
+                  if (item === "Profile") {
                     router.push("/profileScreen");
                   } else {
                     console.log(item);

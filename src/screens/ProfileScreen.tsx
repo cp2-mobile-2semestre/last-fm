@@ -1,26 +1,26 @@
-import { useEffect, useState } from "react";
+import { auth } from "@/services/firebase";
 import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-  Modal,
-  TextInput,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  loadProfile,
-  updateProfile,
-  addFavoriteTrack,
   addFavoriteArtist,
+  addFavoriteTrack,
+  loadProfile,
   unfavoriteArtist,
+  updateProfile,
 } from "@/services/profileService";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/services/firebase";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState("Visão geral");
@@ -299,8 +299,6 @@ export default function ProfileScreen() {
 
             <Text style={styles.sectionTitle}>FAIXA EM DESTAQUE</Text>
 
-      
-
             {profile?.favoriteTracks?.length > 0 ? (
               profile.favoriteTracks.map((track: any) => (
                 <View key={track.id} style={styles.trackRow}>
@@ -332,8 +330,10 @@ export default function ProfileScreen() {
               <Text style={styles.addButtonText}>+ Adicionar música</Text>
             </TouchableOpacity>
 
-
-            <Text style={styles.heading}>Últimas faixas</Text>
+            <View style={styles.artistHeading}>
+              <Text style={styles.heading}>Artistas principais</Text>
+              <Text style={styles.period}>Últimos 7 dias⌄</Text>
+            </View>
 
             {profile?.favoriteArtists?.length > 0 ? (
               <View style={styles.artistGrid}>
@@ -354,37 +354,9 @@ export default function ProfileScreen() {
                         onPress={() => removeFavoriteArtist(artist.id)}
                       >
                         <Text style={styles.removeArtistText}>
-                          Remover favorito
+                          Remover dos favoritos
                         </Text>
                       </TouchableOpacity>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            ) : (
-              <Text style={styles.emptyText}>
-                Você ainda não adicionou artistas favoritos.
-              </Text>
-            )}
-
-            <View style={styles.artistHeading}>
-              <Text style={styles.heading}>Artistas principais</Text>
-              <Text style={styles.period}>Últimos 7 dias⌄</Text>
-            </View>
-
-            {profile?.favoriteArtists?.length > 0 ? (
-              <View style={styles.artistGrid}>
-                {profile.favoriteArtists.map((artist: any) => (
-                  <View key={artist.id} style={styles.artistCard}>
-                    {!!artist.imageUrl && (
-                      <Image
-                        source={{ uri: artist.imageUrl }}
-                        style={styles.artistImage}
-                      />
-                    )}
-
-                    <View style={styles.artistOverlay}>
-                      <Text style={styles.artistCardName}>{artist.name}</Text>
                     </View>
                   </View>
                 ))}
