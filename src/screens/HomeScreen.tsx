@@ -1,5 +1,5 @@
 import MainCard from "@/components/MainCard";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Pressable,
   ScrollView,
@@ -9,6 +9,12 @@ import {
   useWindowDimensions,
   ImageBackground,
 } from "react-native";
+
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/services/firebase";
+import { monitorPresence } from "@/services/presence";
+
+import { router } from "expo-router";
 
 import MiniCard from "@/components/MiniCard";
 
@@ -49,15 +55,36 @@ const tags = [
     name: "Dance",
     image: require("@/assets/images/Daft_Punk_in_2013.jpg"),
   },
-
 ];
 
-const navLinks = ["Music", "Events", "Charts"];
+const navLinks = ["Music", "Events", "Charts", "Perfil"];
 const tabs = ["Overview", "New Releases"];
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState("Overview");
+
+  const [isOnline, setIsOnline] = useState(false);
+
+  useEffect(() => {
+    let stopPresence: (() => void) | undefined;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      stopPresence?.();
+      stopPresence = undefined;
+
+      if (user) {
+        stopPresence = monitorPresence(user.uid, setIsOnline);
+      } else {
+        setIsOnline(false);
+      }
+    });
+
+    return () => {
+      unsubscribeAuth();
+      stopPresence?.();
+    };
+  }, []);
 
   const isWide = width >= 768;
   const pageWidth = Math.min(width - 32, 1000);
@@ -84,7 +111,13 @@ export default function HomeScreen() {
             {navLinks.map((item) => (
               <Pressable
                 key={item}
-                onPress={() => console.log(item)}
+                onPress={() => {
+                  if (item === "Perfil") {
+                    router.push("/profileScreen");
+                  } else {
+                    console.log(item);
+                  }
+                }}
                 hitSlop={8}
               >
                 <Text style={styles.navText}>{item}</Text>
@@ -92,6 +125,8 @@ export default function HomeScreen() {
             ))}
           </View>
         </View>
+
+        
 
         {/* Título e abas */}
         <View style={styles.titleContainer}>
@@ -147,6 +182,20 @@ export default function HomeScreen() {
               />
             ))}
           </View>
+        </View>
+        <View style={styles.presenceContainer}>
+          <View
+            style={[
+              styles.presenceDot,
+              {
+                backgroundColor: isOnline ? "#2eaa54" : "#999",
+              },
+            ]}
+          />
+
+          <Text style={styles.presenceText}>
+            {isOnline ? "Você está online" : "Conectando..."}
+          </Text>
         </View>
       </ScrollView>
     </View>
@@ -286,4 +335,23 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
+
+  presenceContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  marginTop: 12,
+},
+
+presenceDot: {
+  width: 8,
+  height: 8,
+  borderRadius: 4,
+},
+
+presenceText: {
+  color: "#555",
+  fontSize: 12,
+},
 });

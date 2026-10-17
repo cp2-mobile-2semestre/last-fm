@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import {getAuth} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -17,6 +18,11 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+export const database = getDatabase(
+  app,
+  "https://mini-lastfm-default-rtdb.firebaseio.com"
+);
 
 export const auth = getAuth(app)
 export const firestore = getFirestore(app)

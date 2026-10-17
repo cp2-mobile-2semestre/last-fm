@@ -11,7 +11,9 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "@/services/firebase";
+
+import { doc, setDoc } from "firebase/firestore";
+import { auth, firestore } from "@/services/firebase";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
@@ -29,19 +31,46 @@ export default function LoginScreen() {
       //criar hook para persistir o token
       const token = credential.user.getIdToken();
 
-      router.replace("/profileScreen" as any);
+      router.replace("/home" as any);
     } catch (error: any) {
       alert("Usuario não encontrado.");
     }
   };
 
-  const sigUp = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error: any) {
-      alert("Não foi possivel realziar o login");
-    }
-  };
+  
+const sigUp = async () => {
+  try {
+
+    const credential = await createUserWithEmailAndPassword(
+      auth,
+      email.trim(),
+      password
+    );
+
+    const user = credential.user;
+
+    await setDoc(doc(firestore, "users", user.uid), {
+      displayName: username.trim(),
+      bio: "",
+      photoURL: "",
+    });
+
+ 
+    alert("Conta criada e perfil salvo com sucesso!");
+
+  
+
+  } catch (error: any) {
+    console.error("Erro ao criar conta ou salvar perfil:", error);
+
+    alert(
+      error.code === "permission-denied"
+        ? "Sem permissão para salvar os dados no Firestore."
+        : error.message || "Não foi possível criar a conta."
+    );
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.container}>

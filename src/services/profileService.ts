@@ -74,16 +74,41 @@ export async function addFavoriteArtist(
   },
 ) {
   return setDoc(
-    doc(firestore, "userId", userId, "favoriteArtists", artist.id),
+    doc(firestore, "users", userId, "favoriteArtists", artist.id),
     {
       name: artist.name,
-      ImageUrl: artist.imageUrl,
+      imageUrl: artist.imageUrl,
     },
   );
 }
 
-export async function unfavoriteArtist(userId: string, artistId: string) {
-  return deleteDoc(
-    doc(firestore, "users", userId, "favoriteArtists", artistId),
+
+export async function unfavoriteArtist(
+  userId: string,
+  artistId: string
+) {
+  const artistRef = doc(
+    firestore,
+    "users",
+    userId,
+    "favoriteArtists",
+    artistId
   );
+
+  const artistSnap = await getDoc(artistRef);
+
+  if (!artistSnap.exists()) {
+    throw new Error(
+      `Artista não encontrado no Firestore. ID: ${artistId}`
+    );
+  }
+
+  await deleteDoc(artistRef);
+
+  const deletedSnap = await getDoc(artistRef);
+
+  if (deletedSnap.exists()) {
+    throw new Error("O documento continua existindo após a exclusão.");
+  }
 }
+
